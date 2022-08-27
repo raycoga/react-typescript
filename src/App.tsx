@@ -1,42 +1,75 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import List from "./components/List";
+import Form from "./components/Form";
 
-interface Subs {
-  nick: string;
-  subMonths: number;
-  avatar: string;
-  description?: string;
+import { Sub, SubResponse } from "./types";
+
+interface AppState {
+  sub: Sub[];
+  newSubsNumber: number;
 }
 
 const INITIAL_STATE = [
   {
     nick: "dapelu",
-    subMonths: 3,
-    avatar: "https://i.pravatar.cc/150?u=dapelu",
-    description: "",
+    email: 3,
+    website: "https://i.prwebsite.cc/150?u=dapelu",
+    phone:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quidem.",
   },
   {
     nick: "marielu",
-    subMonths: 3,
-    avatar: "https://i.pravatar.cc/150?u=marielu",
-    description: "",
+    email: 3,
+    website: "https://i.prwebsite.cc/150?u=marielu",
+  },
+  {
+    nick: "sergio_serrano",
+    email: 3,
+    website: "https://i.prwebsite.cc/150?u=sergio_serrano",
   },
 ];
 
 function App() {
-  const [subs, setSubs] = useState<Array<Subs>>(INITIAL_STATE);
+  const divRef = useRef<HTMLDivElement>(null);
+  const [subs, setSubs] = useState<AppState["sub"]>([]);
+  const [newSubsNumber, setNewSubsNumber] =
+    useState<AppState["newSubsNumber"]>(0);
+    
+  useEffect(() => {
+    //setSubs(INITIAL_STATE);
+    const fetchSubs = (): Promise<SubResponse[]> => {
+      return fetch("https://jsonplaceholder.typicode.com/users").then((res) =>
+        res.json()
+      );
+    };
+    const mapFromApiResponse = (apiResponse: SubResponse[]) => {
+      return apiResponse.map((apiSub) => {
+        const data = {
+          nick: apiSub.username,
+          email: apiSub.email,
+          website: apiSub.website,
+          phone: apiSub.phone,
+        };
+        return data;
+      });
+    };
+    fetchSubs().then(mapFromApiResponse).then(setSubs);
+  }, []);
+
+  const handleNewSub = (newSub: Sub) => {
+    setSubs([...subs, newSub]);
+    setNewSubsNumber((n) => n + 1);
+  };
 
   return (
-    <div>
+    <div ref={divRef}>
+      <h1>Midu subs</h1>
+      New subs: {newSubsNumber}
+      <Form onNewSub={handleNewSub} />
       <ul>
-        {subs.map((sub) => (
-          <li key={sub.nick}>
-            <img src={sub.avatar} alt={sub.nick} />
-            <strong>{sub.nick}</strong>
-            <span>{sub.subMonths} meses</span>
-            <p>{sub.description}</p>
-          </li>
-        ))}
+        <List subs={subs} />
       </ul>
+      
     </div>
   );
 }
