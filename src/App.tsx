@@ -1,24 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+
+interface Subs {
+  nick: string;
+  subMonths: number;
+  avatar: string;
+  description?: string;
+}
+
+const INITIAL_STATE = [
+  {
+    nick: "dapelu",
+    subMonths: 3,
+    avatar: "https://i.pravatar.cc/150?u=dapelu",
+    description: "",
+  },
+  {
+    nick: "marielu",
+    subMonths: 3,
+    avatar: "https://i.pravatar.cc/150?u=marielu",
+    description: "",
+  },
+];
 
 function App() {
+  const [subs, setSubs] = useState<Array<Subs>>(INITIAL_STATE);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ul>
+        {subs.map((sub) => (
+          <li key={sub.nick}>
+            <img src={sub.avatar} alt={sub.nick} />
+            <strong>{sub.nick}</strong>
+            <span>{sub.subMonths} meses</span>
+            <p>{sub.description}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
